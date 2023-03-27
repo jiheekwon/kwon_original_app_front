@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import axios from "./axios";
+import { TextField, Button, Container } from "@mui/material";
+import Post from "./components/Post";
 
-function App() {
+const App = () => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  const submit = async() => {
+    await axios.post('/create', {
+      title: title,
+      content: content
+    }).then(() => {
+      setTitle('');
+      setContent('');
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+        <div className="title-box">
+          <TextField fullWidth id="out-lined-basic fullWidth" label="Title" value={title} variant="outlined" onChange={(e) => {setTitle(e.target.value)}}></TextField>
+        </div>
+        <br/>
+        <div className="content-box">
+          <TextField multiline fullWidth id="outlined-multiline-static fullWidth" label="content" value={content} rows={4} onChange={(e) => {setContent(e.target.value)}}></TextField>
+        </div>
+        <br/>
+        <div className="submit-button">
+          <Button variant="contained" onClick={submit}>Submit</Button>
+        </div>
+
+        <Post />
+    </Container>
   );
 }
 
