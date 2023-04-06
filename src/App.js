@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "./axios";
 import { TextField, Button, Container } from "@mui/material";
 import Post from "./components/Post";
@@ -6,6 +6,14 @@ import Post from "./components/Post";
 const App = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [change, setChange] = useState(false);
+
+  const getData = async() => {
+    const response = await axios.get('/');
+    console.log(response.data);
+    setPosts(response.data);
+  }
 
   const submit = async() => {
     await axios.post('/create', {
@@ -14,9 +22,19 @@ const App = () => {
     }).then(() => {
       setTitle('');
       setContent('');
+      setChange(true);
     }).catch((err) => {
       console.log(err);
     });
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+  
+  if(change) {
+    getData();
+    setChange(false);
   }
 
   return (
@@ -32,8 +50,14 @@ const App = () => {
         <div className="submit-button">
           <Button variant="contained" onClick={submit}>Submit</Button>
         </div>
-
-        <Post />
+        {posts.map((post) => (
+          <div key={post.id}>
+            <p>title: {post.title}</p>
+            <p>content: {post.content}</p>
+            <p>createdAt: {post.created_at}</p>
+            <p>---------------------</p>
+          </div>
+        ))}
     </Container>
   );
 }
